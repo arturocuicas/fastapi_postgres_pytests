@@ -11,4 +11,7 @@ down:
 shell: run
 	@docker exec -it fastapi_service bash
 
-.PHONY: dev run stop shell
+tests: run
+	@docker exec -it fastapi_service poetry run pytest
+
+.PHONY: dev run stop shell tests

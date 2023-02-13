@@ -21,6 +21,7 @@ class GlobalConfig(BaseConfig):
     postgres_server: str = os.environ.get("POSTGRES_SERVER")
     postgres_port: int = int(os.environ.get("POSTGRES_PORT"))
     postgres_db: str = os.environ.get("POSTGRES_DB")
+    postgres_db_tests: str = os.environ.get("POSTGRES_DB_TESTS")
     db_echo_log: bool = True if os.environ.get("DEBUG") == "True" else False
 
     @property
