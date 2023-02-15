@@ -18,7 +18,7 @@ test_db = f"postgresql+asyncpg://{settings.postgres_user}:{settings.postgres_pas
 
 engine = create_async_engine(
     test_db,
-    echo=False,  # settings.db_echo_log,
+    echo=settings.db_echo_log,
     future=True,
 )
 
