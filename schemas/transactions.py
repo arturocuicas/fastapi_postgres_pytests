@@ -1,4 +1,4 @@
-from db.tables.base_class import UUIDModel
+from uuid import UUID
 from db.tables.transactions import TransactionBase
 
 
@@ -6,5 +6,9 @@ class TransactionCreate(TransactionBase):
     ...
 
 
-class TransactionRead(UUIDModel, TransactionBase):
+class TransactionRead(TransactionBase):
+    id: UUID
+
+
+class TransactionPatch(TransactionBase):
     ...

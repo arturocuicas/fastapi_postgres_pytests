@@ -1,7 +1,7 @@
 import asyncio
 import pytest
 import pytest_asyncio
-from typing import AsyncGenerator, Generator, Callable, List, Union
+from typing import AsyncGenerator, Generator, Callable
 
 from fastapi import FastAPI
 from httpx import AsyncClient
@@ -18,7 +18,7 @@ test_db = f"postgresql+asyncpg://{settings.postgres_user}:{settings.postgres_pas
 
 engine = create_async_engine(
     test_db,
-    echo=settings.db_echo_log,
+    echo=False,  # settings.db_echo_log,
     future=True,
 )
 
@@ -67,7 +67,7 @@ async def async_client(app: FastAPI) -> AsyncGenerator:
         yield ac
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def create_transaction():
     def _create_transaction(
         amount: int = 10,
@@ -81,7 +81,7 @@ def create_transaction():
     return _create_transaction
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def create_transactions(create_transaction):
     def _create_transactions(
         _qty: int = 1
