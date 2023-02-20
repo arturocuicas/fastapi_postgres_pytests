@@ -5,9 +5,9 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from db.errors import EntityDoesNotExist
-from db.tables.transactions import Transaction
 from db.tables.base_class import StatusEnum
-from schemas.transactions import TransactionCreate, TransactionRead, TransactionPatch
+from db.tables.transactions import Transaction
+from schemas.transactions import TransactionCreate, TransactionPatch, TransactionRead
 
 
 class TransactionRepository:
@@ -34,15 +34,13 @@ class TransactionRepository:
 
     async def list(self, limit: int = 10, offset: int = 0) -> list[TransactionRead]:
         statement = (
-            select(Transaction)
-            .where(Transaction.status != StatusEnum.deleted)
-        ).offset(offset).limit(limit)
+            (select(Transaction).where(Transaction.status != StatusEnum.deleted))
+            .offset(offset)
+            .limit(limit)
+        )
         results = await self.session.exec(statement)
 
-        return [
-            TransactionRead(**transaction.dict())
-            for transaction in results
-        ]
+        return [TransactionRead(**transaction.dict()) for transaction in results]
 
     async def get(self, transaction_id: UUID) -> Optional[TransactionRead]:
         db_transaction = await self._get_instance(transaction_id)
@@ -52,7 +50,9 @@ class TransactionRepository:
 
         return TransactionRead(**db_transaction.dict())
 
-    async def patch(self, transaction_id: UUID, transaction_patch: TransactionPatch) -> Optional[TransactionRead]:
+    async def patch(
+        self, transaction_id: UUID, transaction_patch: TransactionPatch
+    ) -> Optional[TransactionRead]:
         db_transaction = await self._get_instance(transaction_id)
 
         if db_transaction is None:

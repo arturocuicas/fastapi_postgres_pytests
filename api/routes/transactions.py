@@ -1,12 +1,12 @@
 from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Body, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, status
 
 from api.dependencies.repositories import get_repository
 from db.errors import EntityDoesNotExist
 from db.repositories.transactions import TransactionRepository
-from schemas.transactions import TransactionCreate, TransactionRead, TransactionPatch
+from schemas.transactions import TransactionCreate, TransactionPatch, TransactionRead
 
 router = APIRouter()
 
@@ -96,6 +96,5 @@ async def delete_transaction(
         )
 
     return await repository.patch(
-        transaction_id=transaction_id,
-        transaction_patch=transaction_patch
+        transaction_id=transaction_id, transaction_patch=transaction_patch
     )

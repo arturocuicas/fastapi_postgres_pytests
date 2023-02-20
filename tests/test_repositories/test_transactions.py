@@ -1,17 +1,15 @@
 from uuid import UUID, uuid4
+
 import pytest
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from db.repositories.transactions import TransactionRepository
 from db.errors import EntityDoesNotExist
+from db.repositories.transactions import TransactionRepository
 from schemas.transactions import TransactionPatch
 
 
 @pytest.mark.asyncio
-async def test_create_transaction(
-    db_session: AsyncSession,
-    create_transaction
-):
+async def test_create_transaction(db_session: AsyncSession, create_transaction):
     transaction = create_transaction()
     repository = TransactionRepository(db_session)
 
@@ -23,10 +21,7 @@ async def test_create_transaction(
 
 
 @pytest.mark.asyncio
-async def test_get_transactions(
-    db_session: AsyncSession,
-    create_transaction
-):
+async def test_get_transactions(db_session: AsyncSession, create_transaction):
     transaction = create_transaction()
     repository = TransactionRepository(db_session)
     await repository.create(transaction)
@@ -39,10 +34,7 @@ async def test_get_transactions(
 
 
 @pytest.mark.asyncio
-async def test_get_transaction_by_id(
-    db_session: AsyncSession,
-    create_transaction
-):
+async def test_get_transaction_by_id(db_session: AsyncSession, create_transaction):
     transaction = create_transaction()
     repository = TransactionRepository(db_session)
 
@@ -53,9 +45,7 @@ async def test_get_transaction_by_id(
 
 
 @pytest.mark.asyncio
-async def test_get_transaction_by_id_not_found(
-    db_session: AsyncSession
-):
+async def test_get_transaction_by_id_not_found(db_session: AsyncSession):
     repository = TransactionRepository(db_session)
 
     with pytest.raises(expected_exception=EntityDoesNotExist):
@@ -63,10 +53,7 @@ async def test_get_transaction_by_id_not_found(
 
 
 @pytest.mark.asyncio
-async def test_update_transaction(
-    db_session: AsyncSession,
-    create_transaction
-):
+async def test_update_transaction(db_session: AsyncSession, create_transaction):
     init_amount = 10
     init_description = "Initial Description"
     final_amount = 20
@@ -78,9 +65,8 @@ async def test_update_transaction(
     update_transaction = await repository.patch(
         transaction_id=db_transaction.id,
         transaction_patch=TransactionPatch(
-            amount=final_amount,
-            description=final_description
-        )
+            amount=final_amount, description=final_description
+        ),
     )
 
     assert update_transaction.id == db_transaction.id
@@ -89,10 +75,7 @@ async def test_update_transaction(
 
 
 @pytest.mark.asyncio
-async def test_soft_delete_transaction(
-    db_session: AsyncSession,
-    create_transaction
-):
+async def test_soft_delete_transaction(db_session: AsyncSession, create_transaction):
     transaction = create_transaction()
     repository = TransactionRepository(db_session)
     db_transaction = await repository.create(transaction)
@@ -102,4 +85,3 @@ async def test_soft_delete_transaction(
     assert delete_transaction is None
     with pytest.raises(expected_exception=EntityDoesNotExist):
         await repository.get(transaction_id=db_transaction.id)
-

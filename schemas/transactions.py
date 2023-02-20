@@ -1,4 +1,5 @@
 from uuid import UUID
+
 from db.tables.transactions import TransactionBase
 
 
