@@ -94,4 +94,3 @@ def create_transactions(create_transaction):
             for i in range(_qty)]
 
     return _create_transactions
-

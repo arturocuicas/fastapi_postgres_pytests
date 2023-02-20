@@ -32,11 +32,11 @@ class TransactionRepository:
 
         return TransactionRead(**db_transaction.dict())
 
-    async def list(self) -> list[TransactionRead]:
+    async def list(self, limit: int = 10, offset: int = 0) -> list[TransactionRead]:
         statement = (
             select(Transaction)
             .where(Transaction.status != StatusEnum.deleted)
-        )
+        ).offset(offset).limit(limit)
         results = await self.session.exec(statement)
 
         return [

@@ -1,12 +1,12 @@
 from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Body, Depends, HTTPException, status
+from fastapi import APIRouter, Body, Depends, HTTPException, status, Query
 
 from api.dependencies.repositories import get_repository
 from db.errors import EntityDoesNotExist
 from db.repositories.transactions import TransactionRepository
-from schemas.transactions import TransactionCreate, TransactionRead
+from schemas.transactions import TransactionCreate, TransactionRead, TransactionPatch
 
 router = APIRouter()
 
@@ -31,9 +31,11 @@ async def create_transaction(
     name="get_transactions",
 )
 async def get_transactions(
+    limit: int = Query(default=10, lte=100),
+    offset: int = Query(default=0),
     repository: TransactionRepository = Depends(get_repository(TransactionRepository)),
 ) -> list[Optional[TransactionRead]]:
-    return await repository.list()
+    return await repository.list(limit=limit, offset=offset)
 
 
 @router.get(
@@ -73,3 +75,27 @@ async def delete_transaction(
         )
 
     return await repository.delete(transaction_id=transaction_id)
+
+
+@router.put(
+    "/transactions/{transaction_id}",
+    response_model=TransactionRead,
+    status_code=status.HTTP_200_OK,
+    name="delete_transaction",
+)
+async def delete_transaction(
+    transaction_id: UUID,
+    transaction_patch: TransactionPatch = Body(...),
+    repository: TransactionRepository = Depends(get_repository(TransactionRepository)),
+) -> TransactionRead:
+    try:
+        await repository.get(transaction_id=transaction_id)
+    except EntityDoesNotExist:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found!"
+        )
+
+    return await repository.patch(
+        transaction_id=transaction_id,
+        transaction_patch=transaction_patch
+    )
